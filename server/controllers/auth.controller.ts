@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import Users from '../models/user.model';
-
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { generateActiveToken } from '../config/generateToken';
+import sendMail from '../config/sendMail';
+import { validateEmail } from '../middleware/valid';
+
+const CLIENT_URL = `${process.env.BASE_URL}`;
 
 const authController = {
 	register: async (req: Request, res: Response) => {
@@ -25,13 +27,12 @@ const authController = {
 			};
 
 			const active_token = generateActiveToken({ newUser });
+			const url = `${CLIENT_URL}/active/${active_token}`;
 
-			res.json({
-				status: 'OK',
-				msg: 'Register successfully.',
-				data: newUser,
-				active_token
-			});
+			if (validateEmail(account)) {
+				sendMail(account, url, 'Verify your email address');
+				return res.json({ msg: 'Success! Please check your email.' });
+			}
 		} catch (error) {
 			return res.status(500).json({ msg: error.message });
 		}
