@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { IUser } from '../config/interface';
 
 const userSchema = new mongoose.Schema(
 	{
@@ -16,8 +17,7 @@ const userSchema = new mongoose.Schema(
 		},
 		password: {
 			type: String,
-			required: [true, 'Please add your password.'],
-			trim: true
+			required: [true, 'Please add your password.']
 		},
 		avatar: {
 			type: String,
@@ -26,11 +26,11 @@ const userSchema = new mongoose.Schema(
 		},
 		role: {
 			type: String,
-			default: 'user'
+			default: 'user' //admin
 		},
 		type: {
 			type: String,
-			default: 'normal'
+			default: 'register' // login
 		}
 	},
 	{
@@ -38,4 +38,4 @@ const userSchema = new mongoose.Schema(
 	}
 );
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model<IUser>('User', userSchema);
