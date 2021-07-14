@@ -1,7 +1,9 @@
 import { ChangeEvent, FormEvent } from 'react';
+import rootReducer from '../redux/reducers/index';
 
 export type InputChange = ChangeEvent<HTMLInputElement>;
 export type FormSubmit = FormEvent<HTMLFormElement>;
+export type RootStore = ReturnType<typeof rootReducer>;
 
 export interface IParams {
 	page: string;
@@ -23,4 +25,10 @@ export interface IUser extends IUserLogin {
 	type: string;
 	updatedAt: string;
 	_id: string;
+}
+
+export interface IAlert {
+	loading?: boolean;
+	success?: string | string[];
+	errors?: string | string[];
 }
