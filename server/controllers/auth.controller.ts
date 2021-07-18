@@ -44,7 +44,7 @@ const authController = {
 				sendSMS(account, url, 'Verify your phone number');
 				return res.json({ msg: 'Success! Please check your phone.' });
 			}
-		} catch (error) {
+		} catch (error: any) {
 			return res.status(500).json({ msg: error.message });
 		}
 	},
@@ -60,20 +60,24 @@ const authController = {
 			const { newUser } = decoded;
 			if (!newUser)
 				return res.status(400).json({ msg: 'Invalid authentication.' });
-			const user = new Users(newUser);
-			await user.save();
+
+			const user = await Users.findOne({ account: newUser.account });
+			if (user) return res.status(400).json({ msg: 'Account already exists.' });
+
+			const new_user = new Users(newUser);
+			await new_user.save();
 
 			res.json({ msg: 'Account has been activated.' });
-		} catch (error) {
-			let errorMsg;
+		} catch (error: any) {
+			// let errorMsg;
 
-			if (error.code === 11000) {
-				errorMsg = Object.keys(error.keyValue)[0] + ' already exists.';
-			} else {
-				let name = Object.keys(error.errors)[0];
-				errorMsg = error.errors[`${name}`].message;
-			}
-			return res.status(500).json({ msg: errorMsg });
+			// if (error.code === 11000) {
+			// 	errorMsg = Object.keys(error.keyValue)[0] + ' already exists.';
+			// } else {
+			// 	let name = Object.keys(error.errors)[0];
+			// 	errorMsg = error.errors[`${name}`].message;
+			// }
+			return res.status(500).json({ msg: error.message });
 		}
 	},
 	login: async (req: Request, res: Response) => {
@@ -86,7 +90,7 @@ const authController = {
 
 			//if user exists
 			loginUser(user, password, res);
-		} catch (error) {
+		} catch (error: any) {
 			return res.status(500).json({ msg: error.message });
 		}
 	},
@@ -95,7 +99,7 @@ const authController = {
 			res.clearCookie('refreshtoken', { path: `/api/refresh_token` });
 
 			return res.json({ msg: 'Logged Out.' });
-		} catch (error) {
+		} catch (error: any) {
 			return res.status(500).json({ msg: error.message });
 		}
 	},
@@ -117,7 +121,7 @@ const authController = {
 			const access_token = generateAccessToken({ id: user._id });
 
 			res.json({ access_token });
-		} catch (error) {
+		} catch (error: any) {
 			return res.status(500).json({ msg: error.message });
 		}
 	}
