@@ -32,6 +32,7 @@ const LoginPass = () => {
 					className='form-control'
 					id='account'
 					name='account'
+					value={account}
 					onChange={handleChangeInput}
 				/>
 			</div>
@@ -47,6 +48,7 @@ const LoginPass = () => {
 						id='password'
 						name='password'
 						onChange={handleChangeInput}
+						value={password}
 					/>
 
 					<small onClick={() => setTypePass(!typePass)}>

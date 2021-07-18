@@ -11,7 +11,7 @@ const Login = () => {
 			<div className='auth_box'>
 				<h3 className='text-uppercase text-center mb-4'>Login</h3>
 
-				{ sms ? <LoginSMS /> : <LoginPass/> }
+				{sms ? <LoginSMS /> : <LoginPass />}
 
 				<small className='row my-2 text-primary' style={{ cursor: 'pointer' }}>
 					<span className='col-6'>
@@ -23,9 +23,9 @@ const Login = () => {
 				</small>
 
 				<p>
-					You don't have an account ?
+					{`You don't have an account ? `}
 					<Link to={`/register`} style={{ color: 'crimson' }}>
-						{` Register Now`}
+						Register Now
 					</Link>
 				</p>
 			</div>
