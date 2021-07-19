@@ -3,6 +3,7 @@ import Users from '../models/user.model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import fetch from 'node-fetch';
 
 import {
 	generateActiveToken,
@@ -163,6 +164,40 @@ const authController = {
 					account: email,
 					password: passwordHash,
 					avatar: picture,
+					type: 'login'
+				};
+				registerUser(user, res);
+			}
+		} catch (error: any) {
+			return res.status(500).json({ msg: error.message });
+		}
+	},
+	facebookLogin: async (req: Request, res: Response) => {
+		try {
+			const { accessToken, userID } = req.body;
+			// console.log({ accessToken, userID });
+
+			const URL = `https://graph.facebook.com/v3.0/${userID}/?fields=id,name,email,picture&access_token=${accessToken}`;
+			const data = await fetch(URL)
+				.then((res) => res.json())
+				.then((res) => {
+					return res;
+				});
+			// console.log(data);
+
+			const { id, email, name, picture } = data;
+			const password = email + `${process.env.FACEBOOK_SECRET}`;
+			const passwordHash = await bcrypt.hash(password, 12);
+
+			const user = await Users.findOne({ account: email });
+			if (user) {
+				loginUser(user, password, res);
+			} else {
+				const user = {
+					name,
+					account: email,
+					password: passwordHash,
+					avatar: picture.data.url,
 					type: 'login'
 				};
 				registerUser(user, res);
