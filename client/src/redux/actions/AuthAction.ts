@@ -76,3 +76,24 @@ export const logout =
 			dispatch({ type: ALERT, payload: { errors: error.response.data.msg } });
 		}
 	};
+
+export const googleLogin =
+	(id_token: string) => async (dispatch: Dispatch<IAuthType | IAlertType>) => {
+		// console.log(userLogin);
+		try {
+			dispatch({ type: ALERT, payload: { loading: true } });
+			const res = await postAPI('google_login', { id_token });
+			// console.log(res);
+
+			dispatch({
+				type: AUTH,
+				payload: res.data
+			});
+
+			dispatch({ type: ALERT, payload: { success: res.data.msg } });
+
+			localStorage.setItem('logged', 'ls');
+		} catch (error: any) {
+			dispatch({ type: ALERT, payload: { errors: error.response.data.msg } });
+		}
+	};
