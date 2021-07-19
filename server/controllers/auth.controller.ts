@@ -13,7 +13,7 @@ import {
 import sendMail from '../config/sendMail';
 import { validateEmail, validatePhone } from '../middleware/valid';
 
-import { sendSMS } from './../config/sendSMS';
+import { sendSMS, smsOTP, smsVerify } from './../config/sendSMS';
 import {
 	IDecodedToken,
 	IUser,
@@ -198,6 +198,45 @@ const authController = {
 					account: email,
 					password: passwordHash,
 					avatar: picture.data.url,
+					type: 'login'
+				};
+				registerUser(user, res);
+			}
+		} catch (error: any) {
+			return res.status(500).json({ msg: error.message });
+		}
+	},
+	loginSMS: async (req: Request, res: Response) => {
+		try {
+			const { phone } = req.body;
+			// console.log(phone);
+			const data = await smsOTP(phone, 'sms');
+			// console.log(data)
+
+			res.json(data);
+		} catch (error: any) {
+			return res.status(500).json({ msg: error.message });
+		}
+	},
+	smsVerify: async (req: Request, res: Response) => {
+		try {
+			const { phone, code } = req.body;
+			// console.log(phone);
+			const data = await smsVerify(phone, code);
+			// console.log(data)
+			if (!data?.valid)
+				return res.status(400).json({ msg: 'Invalid Authentication' });
+			const password = phone + `${process.env.PHONE_SECRET}`;
+			const passwordHash = await bcrypt.hash(password, 12);
+
+			const user = await Users.findOne({ account: phone });
+			if (user) {
+				loginUser(user, password, res);
+			} else {
+				const user = {
+					name: phone,
+					account: phone,
+					password: passwordHash,
 					type: 'login'
 				};
 				registerUser(user, res);
