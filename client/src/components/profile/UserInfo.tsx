@@ -8,7 +8,7 @@ import {
 	FormSubmit
 } from '../../utils/TypeScript';
 import NotFound from '../global/NotFound';
-import { updateUser } from '../../redux/actions/profileAction';
+import { updateUser, resetPassword } from '../../redux/actions/profileAction';
 
 const UserInfo = () => {
 	const initState = {
@@ -45,9 +45,13 @@ const UserInfo = () => {
 		if (avatar || name) {
 			dispatch(updateUser(avatar as File, name, auth));
 		}
+
+		if (password && auth.access_token) {
+			dispatch(resetPassword(password, cf_password, auth.access_token));
+		}
 	};
 
-	const { name, account, avatar, password, cf_password } = user;
+	const { name, avatar, password, cf_password } = user;
 
 	if (!auth.user) return <NotFound />;
 
@@ -93,6 +97,11 @@ const UserInfo = () => {
 					disabled={true}
 				/>
 			</div>
+			{auth.user.type !== 'register' && (
+				<small className='text-danger'>
+					* Quick login account with {auth.user.type} can't use this function. *
+				</small>
+			)}
 			<div className='form-group my-3'>
 				<label htmlFor='password'>Password</label>
 				<div className='pass'>
@@ -103,6 +112,7 @@ const UserInfo = () => {
 						className='form-control'
 						value={password}
 						onChange={handleChangeInput}
+						disabled={auth.user.type !== 'register'}
 					/>
 					<small onClick={() => setTypePass(!typePass)}>
 						{typePass ? 'Hide' : 'Show'}
@@ -119,6 +129,7 @@ const UserInfo = () => {
 						className='form-control'
 						value={cf_password}
 						onChange={handleChangeInput}
+						disabled={auth.user.type !== 'register'}
 					/>
 					<small onClick={() => setTypeCfPass(!typeCfPass)}>
 						{typeCfPass ? 'Hide' : 'Show'}
