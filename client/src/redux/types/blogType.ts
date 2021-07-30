@@ -6,7 +6,7 @@ export interface IHomeBlogs {
 	_id: string;
 	name: string;
 	count: number;
-	blosg: IBlog[];
+	blogs: IBlog[];
 }
 
 export interface IGetHomeBlogsType {
